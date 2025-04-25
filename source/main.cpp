@@ -7,6 +7,7 @@
 #include <iostream>
 #include "meshObject.hpp"
 #include "gridObject.hpp"
+#include <string> // For file paths
 
 const GLuint windowWidth = 1024;
 const GLuint windowHeight = 768;
@@ -30,16 +31,20 @@ int main() {
 
     // Scene
     gridObject grid;
-    meshObject  obj;
-    obj.translate(glm::vec3(0.0f, 0.0f, 3.0f));
+    // Load the custom head model and texture
+    meshObject head("C:/Users/provi/Downloads/cg_project_1 (1)/cg_project_1/source/low_poly_head.obj", "C:/Users/provi/Downloads/cg_project_1 (1)/cg_project_1/source/head-filled-skylum.jpeg");
+    // Rotate the head to face the camera (assuming +Z is forward in model space and camera looks towards -Z)
+    head.rotate(180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    // Optional: Translate slightly if needed, e.g., head.translate(glm::vec3(0.0f, -5.0f, 0.0f)); to lower it
 
     // Camera state
     bool cameraSelected = false, cWasPressed = false;
     bool rWasPressed = false;
+    bool fWasPressed = false; // Track 'F' key state for wireframe toggle
     float horizontalAngle = 0.0f;
     float verticalAngle = 0.0f;
     const float cameraSpeed = glm::radians(90.0f);  // 90°/sec
-    const float cameraRadius = 15.0f;                // distance
+    const float cameraRadius = 20.0f;                // distance
 
     double lastFrameTime = glfwGetTime();
     double lastFPSTime = lastFrameTime;
@@ -76,6 +81,14 @@ int main() {
             std::cout << "View reset to startup state\n";
         }
         rWasPressed = rPressed;
+
+        // --- toggle wireframe with F ---        
+        bool fPressed = (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS);
+        if (fPressed && !fWasPressed) {
+            head.toggleWireframe();
+            std::cout << "Wireframe toggled\n";
+        }
+        fWasPressed = fPressed;
 
         // --- when camera is ON, handle arrow keys ---
         if (cameraSelected) {
@@ -116,7 +129,7 @@ int main() {
         // --- render ---
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         grid.draw(viewMatrix, projectionMatrix);
-        obj.draw(viewMatrix, projectionMatrix);
+        head.draw(viewMatrix, projectionMatrix); // Draw the head model
 
         glfwSwapBuffers(window);
         glfwPollEvents();
