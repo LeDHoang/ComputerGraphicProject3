@@ -36,11 +36,14 @@ int main() {
     // Rotate the head to face the camera (assuming +Z is forward in model space and camera looks towards -Z)
     head.rotate(180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     // Optional: Translate slightly if needed, e.g., head.translate(glm::vec3(0.0f, -5.0f, 0.0f)); to lower it
+    head.setSubdivisionLevel(2); // Pre-calculate subdivision level 2
 
     // Camera state
     bool cameraSelected = false, cWasPressed = false;
     bool rWasPressed = false;
     bool fWasPressed = false; // Track 'F' key state for wireframe toggle
+    bool pWasPressed = false; // Track 'P' key state for smooth toggle
+    bool uWasPressed = false; // Track 'U' key state for texture toggle
     float horizontalAngle = 0.0f;
     float verticalAngle = 0.0f;
     const float cameraSpeed = glm::radians(90.0f);  // 90°/sec
@@ -89,6 +92,20 @@ int main() {
             std::cout << "Wireframe toggled\n";
         }
         fWasPressed = fPressed;
+
+        // --- toggle smooth subdivision with P ---
+        bool pPressed = (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
+        if (pPressed && !pWasPressed) {
+            head.toggleSmooth();
+        }
+        pWasPressed = pPressed;
+
+        // --- toggle texture with U ---
+        bool uPressed = (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS);
+        if (uPressed && !uWasPressed) {
+            head.toggleTexture();
+        }
+        uWasPressed = uPressed;
 
         // --- when camera is ON, handle arrow keys ---
         if (cameraSelected) {
